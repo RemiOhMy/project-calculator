@@ -1,4 +1,5 @@
 let previousOperand, currentOperand = 0;
+let currentOperator;
 
 const allClearBtn = document.querySelector(".allclear");
 const deleteBtn = document.querySelector(".delete");
@@ -14,8 +15,9 @@ numberBtns.forEach((btn) => btn.addEventListener("click", (e) => pressNumber(e))
 operatorBtns.forEach((btn) => btn.addEventListener("click", (e) => pressOperator(e)));
 
 function allClearFn() {
-    previousOperand = 0;
-    currentOperand = 0;
+    previousOperand = null;
+    currentOperand = null;
+    currentOperator = null;
     previousOutput.textContent = "";
     currentOutput.textContent = "";
 }
@@ -30,16 +32,71 @@ function pressNumber(e) {
             currentOutput.textContent += ".";
         }
     }
-    else if (e.target.id === "zero"){
+    else if (e.target.id === "zero") {
         if (!(currentOutput.textContent === "0")) {
             if (currentOutput.textContent.length < 15) {
                 currentOutput.textContent += e.target.innerText;
-            };
+            }
         }
     }
     else {
         if (currentOutput.textContent.length < 15) {
             currentOutput.textContent += e.target.innerText;
-        };
-    };
+        }
+    }
+    currentOperand = parseFloat(currentOutput.textContent);
+}
+
+function pressOperator(e) {
+    if (e.target.id === "add") {
+        operate("+");
+    }
+    else if (e.target.id === "subtract") {
+        operate("-");
+    }
+    else if (e.target.id === "multiply") {
+        operate("*");
+    }
+    else if (e.target.id === "divide") {
+        operate("/");
+    }
+    else if (e.target.id === "equals") {
+        evaluate();
+    }
+}
+
+function operate(operation) {
+    if (!currentOperand) return;
+    if (!previousOperand) {
+        currentOperand = parseFloat(currentOutput.textContent);
+        previousOperand = currentOperand;
+        previousOutput.textContent = currentOutput.textContent + ` ${operation}`;
+        currentOperator = operation;
+        currentOperand = null;
+        currentOutput.textContent = "";
+    }
+    else if (currentOperator) {
+        evaluate();
+    }
+}
+
+function evaluate() {
+    if (!currentOperand) return;
+    if (!previousOperand) return;
+    if (!currentOperator) return;
+
+    previousOutput.textContent += ` ${currentOperand}`;
+    switch (currentOperator) {
+        case "+": currentOperand = previousOperand + currentOperand;
+        break;
+        case "-": currentOperand = previousOperand - currentOperand;
+        break;
+        case "*": currentOperand = previousOperand * currentOperand;
+        break;
+        case "/": currentOperand = previousOperand / currentOperand;
+        break;
+    }
+    currentOutput.textContent = currentOperand;
+    previousOperand = null;
+    currentOperator = null;
 }
